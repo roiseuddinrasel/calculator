@@ -1,84 +1,1110 @@
-# -------------------------------
-# Arithmetic Functions
-# -------------------------------
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CalcuLove — Age & Love Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0a12;
+    --surface: #16111f;
+    --surface2: #1e1630;
+    --border: rgba(255,255,255,0.07);
+    --gold: #e8c97a;
+    --rose: #f06c8b;
+    --violet: #9b7fe8;
+    --text: #f0ebff;
+    --muted: #7a6f99;
+    --glow-gold: rgba(232,201,122,0.15);
+    --glow-rose: rgba(240,108,139,0.2);
+  }
 
-def add(a, b):
-    return a + b
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
 
-def subtract(a, b):
-    return a - b
+  /* Animated background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 20% 20%, rgba(155,127,232,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 80% 80%, rgba(240,108,139,0.1) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 30% at 50% 50%, rgba(232,201,122,0.04) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
 
+  .stars {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .star {
+    position: absolute;
+    border-radius: 50%;
+    background: white;
+    animation: twinkle var(--dur, 3s) var(--delay, 0s) infinite alternate ease-in-out;
+  }
+  @keyframes twinkle {
+    from { opacity: 0.1; transform: scale(1); }
+    to   { opacity: 0.7; transform: scale(1.4); }
+  }
 
-def multiply(a, b):
-    return a * b
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
 
+  /* Header */
+  header {
+    text-align: center;
+    margin-bottom: 56px;
+    animation: fadeDown 0.8s ease both;
+  }
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
 
-def divide(a, b):
-    if b == 0:
-        raise ValueError("Cannot divide by zero.")
-    return a / b
+  .logo-icon {
+    font-size: 2.4rem;
+    margin-bottom: 10px;
+    display: block;
+    filter: drop-shadow(0 0 18px var(--rose));
+    animation: pulse 3s infinite ease-in-out;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50%       { transform: scale(1.08); }
+  }
 
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 5vw, 3.2rem);
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--rose) 50%, var(--violet) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 
-# -------------------------------
-# Input Handling
-# -------------------------------
+  .tagline {
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: 0.95rem;
+    letter-spacing: 0.04em;
+    font-weight: 300;
+  }
 
-def get_number(prompt):
-    while True:
-        try:
-            return float(input(prompt))
-        except ValueError:
-            print("⚠️ Invalid number. Try again.")
+  /* Tab switcher */
+  .tabs {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 40px;
+    animation: fadeUp 0.8s 0.2s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
 
+  .tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 0.02em;
+  }
+  .tab-btn:hover {
+    border-color: rgba(255,255,255,0.15);
+    color: var(--text);
+    transform: translateY(-2px);
+  }
+  .tab-btn.active[data-tab="age"] {
+    background: linear-gradient(135deg, rgba(232,201,122,0.2), rgba(232,201,122,0.05));
+    border-color: rgba(232,201,122,0.4);
+    color: var(--gold);
+    box-shadow: 0 4px 24px rgba(232,201,122,0.12);
+  }
+  .tab-btn.active[data-tab="love"] {
+    background: linear-gradient(135deg, rgba(240,108,139,0.2), rgba(240,108,139,0.05));
+    border-color: rgba(240,108,139,0.4);
+    color: var(--rose);
+    box-shadow: 0 4px 24px rgba(240,108,139,0.12);
+  }
+  .tab-btn.active[data-tab="calc"] {
+    background: linear-gradient(135deg, rgba(155,127,232,0.2), rgba(155,127,232,0.05));
+    border-color: rgba(155,127,232,0.4);
+    color: var(--violet);
+    box-shadow: 0 4px 24px rgba(155,127,232,0.15);
+  }
 
-def get_operation():
-    operations = ["+", "-", "*", "/"]
-    while True:
-        op = input("Choose operation (+, -, *, /): ")
-        if op in operations:
-            return op
-        print("⚠️ Invalid operation.")
+  #calc-panel .card::before {
+    background: linear-gradient(90deg, transparent, var(--violet), transparent);
+  }
+  #calc-panel .card-title { color: var(--violet); }
 
+  /* Calculator UI */
+  .calc-display {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    text-align: right;
+    min-height: 90px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    position: relative;
+    overflow: hidden;
+  }
+  .calc-display::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at top right, rgba(155,127,232,0.08), transparent 70%);
+    pointer-events: none;
+  }
+  .calc-expression {
+    font-size: 0.82rem;
+    color: var(--muted);
+    min-height: 20px;
+    margin-bottom: 4px;
+    word-break: break-all;
+    letter-spacing: 0.03em;
+  }
+  .calc-input {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 6vw, 2.8rem);
+    font-weight: 700;
+    color: var(--text);
+    word-break: break-all;
+    line-height: 1.1;
+    text-shadow: 0 0 30px rgba(155,127,232,0.2);
+  }
+  .calc-input.error { color: var(--rose); font-size: 1.4rem; }
 
-# -------------------------------
-# Core Logic
-# -------------------------------
+  .calc-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
 
-def calculate(a, b, operation):
-    if operation == "+":
-        return add(a, b)
-    elif operation == "-":
-        return subtract(a, b)
-    elif operation == "*":
-        return multiply(a, b)
-    elif operation == "/":
-        return divide(a, b)
+  .c-btn {
+    padding: 18px 8px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 0.01em;
+  }
+  .c-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.1);
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .c-btn:hover::after { opacity: 1; }
+  .c-btn:active { transform: scale(0.94); }
 
+  .c-btn.num {
+    background: var(--surface2);
+    color: var(--text);
+    border-color: rgba(255,255,255,0.06);
+  }
+  .c-btn.num:hover { border-color: rgba(155,127,232,0.3); }
 
-# -------------------------------
-# Main Program
-# -------------------------------
+  .c-btn.op {
+    background: rgba(155,127,232,0.12);
+    color: var(--violet);
+    border-color: rgba(155,127,232,0.2);
+    font-size: 1.2rem;
+  }
+  .c-btn.op:hover { background: rgba(155,127,232,0.22); border-color: rgba(155,127,232,0.4); }
 
-def main():
-    print("🧮 Simple Calculator")
+  .c-btn.fn {
+    background: rgba(232,201,122,0.1);
+    color: var(--gold);
+    border-color: rgba(232,201,122,0.15);
+    font-size: 0.88rem;
+  }
+  .c-btn.fn:hover { background: rgba(232,201,122,0.18); }
 
-    while True:
-        num1 = get_number("Enter first number: ")
-        operation = get_operation()
-        num2 = get_number("Enter second number: ")
+  .c-btn.equals {
+    background: linear-gradient(135deg, #7a5ce8, #9b7fe8);
+    color: #fff;
+    border-color: transparent;
+    font-size: 1.4rem;
+    box-shadow: 0 4px 20px rgba(155,127,232,0.35);
+  }
+  .c-btn.equals:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(155,127,232,0.45);
+  }
+  .c-btn.equals:active { transform: scale(0.94) translateY(0); }
 
-        try:
-            result = calculate(num1, num2, operation)
-            print(f"✅ Result: {result}")
-        except Exception as e:
-            print(f"❌ Error: {e}")
+  .c-btn.clear {
+    background: rgba(240,108,139,0.12);
+    color: var(--rose);
+    border-color: rgba(240,108,139,0.2);
+  }
+  .c-btn.clear:hover { background: rgba(240,108,139,0.22); }
 
-        again = input("\nDo another calculation? (y/n): ").lower()
-        if again != "y":
-            print("Goodbye 👋")
-            break
+  .c-btn.span2 { grid-column: span 2; }
 
+  .calc-history {
+    margin-top: 16px;
+    max-height: 110px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 4px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--surface2) transparent;
+  }
+  .history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 7px 12px;
+    background: var(--surface2);
+    border-radius: 8px;
+    font-size: 0.82rem;
+    color: var(--muted);
+    cursor: pointer;
+    transition: background 0.2s;
+    animation: fadeUp 0.25s ease both;
+  }
+  .history-item:hover { background: rgba(155,127,232,0.1); color: var(--text); }
+  .history-item .h-result { color: var(--violet); font-weight: 500; }
 
-if __name__ == "__main__":
-    main()
+  .calc-panel {
+    display: none;
+    animation: panelIn 0.45s ease both;
+  }
+  .calc-panel.active { display: block; }
+
+  @keyframes panelIn {
+    from { opacity: 0; transform: translateY(14px) scale(0.99); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 40px 44px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+  #age-panel .card::before {
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+  #love-panel .card::before {
+    background: linear-gradient(90deg, transparent, var(--rose), transparent);
+  }
+
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  #age-panel .card-title { color: var(--gold); }
+  #love-panel .card-title { color: var(--rose); }
+
+  .card-subtitle {
+    color: var(--muted);
+    font-size: 0.88rem;
+    margin-bottom: 32px;
+    font-weight: 300;
+  }
+
+  /* Form */
+  .form-grid {
+    display: grid;
+    gap: 20px;
+  }
+  .form-grid.two-col {
+    grid-template-columns: 1fr 1fr;
+  }
+  @media(max-width: 560px) {
+    .form-grid.two-col { grid-template-columns: 1fr; }
+    .card { padding: 28px 22px; }
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .field label {
+    font-size: 0.78rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+
+  input[type="date"], input[type="text"] {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.25s, box-shadow 0.25s;
+    color-scheme: dark;
+  }
+  input:focus {
+    border-color: rgba(155,127,232,0.5);
+    box-shadow: 0 0 0 3px rgba(155,127,232,0.1);
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    margin-top: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.08);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .btn:hover::after { opacity: 1; }
+  .btn:active { transform: scale(0.98); }
+
+  .btn-gold {
+    background: linear-gradient(135deg, #c9a84c, #e8c97a, #c9a84c);
+    color: #1a1200;
+    box-shadow: 0 4px 20px rgba(232,201,122,0.3);
+  }
+  .btn-gold:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(232,201,122,0.4);
+  }
+
+  .btn-rose {
+    background: linear-gradient(135deg, #c94d6b, #f06c8b, #c94d6b);
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(240,108,139,0.35);
+  }
+  .btn-rose:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(240,108,139,0.45);
+  }
+
+  /* Results */
+  .result-box {
+    margin-top: 32px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 28px 30px;
+    animation: resultIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+    display: none;
+  }
+  .result-box.show {
+    display: block;
+  }
+  @keyframes resultIn {
+    from { opacity: 0; transform: scale(0.94) translateY(10px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  /* Age result */
+  .age-main {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .age-big {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3.5rem, 8vw, 5.5rem);
+    font-weight: 700;
+    color: var(--gold);
+    line-height: 1;
+    text-shadow: 0 0 40px rgba(232,201,122,0.3);
+  }
+  .age-label {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-top: 4px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .age-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  @media(max-width:480px) { .age-stats { grid-template-columns: 1fr; } }
+
+  .stat-item {
+    background: var(--surface2);
+    border-radius: 12px;
+    padding: 16px 12px;
+    text-align: center;
+  }
+  .stat-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.55rem;
+    font-weight: 700;
+    color: var(--gold);
+    display: block;
+  }
+  .stat-label {
+    font-size: 0.72rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 2px;
+  }
+
+  .next-birthday {
+    margin-top: 16px;
+    text-align: center;
+    padding: 14px;
+    background: rgba(232,201,122,0.06);
+    border: 1px solid rgba(232,201,122,0.15);
+    border-radius: 12px;
+    font-size: 0.88rem;
+    color: var(--gold);
+  }
+
+  /* Love result */
+  .love-score-wrap {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  .heart-ring {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 16px;
+  }
+
+  .heart-ring svg { position: absolute; top: 0; left: 0; transform: rotate(-90deg); }
+  .heart-ring .ring-bg { stroke: var(--surface2); }
+  .heart-ring .ring-fill {
+    stroke: var(--rose);
+    stroke-dasharray: 376;
+    stroke-dashoffset: 376;
+    transition: stroke-dashoffset 1.4s cubic-bezier(0.34,1.56,0.64,1);
+    filter: drop-shadow(0 0 6px var(--rose));
+  }
+
+  .heart-inner {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .heart-emoji { font-size: 2rem; animation: heartbeat 1.2s infinite ease-in-out; }
+  @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    14%       { transform: scale(1.15); }
+    28%       { transform: scale(1); }
+    42%       { transform: scale(1.1); }
+  }
+
+  .love-pct {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--rose);
+    display: block;
+    line-height: 1.1;
+  }
+
+  .love-verdict {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .love-desc {
+    font-size: 0.85rem;
+    color: var(--muted);
+    max-width: 340px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .love-flames {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 14px;
+  }
+  .flame {
+    font-size: 1.4rem;
+    opacity: 0.2;
+    transition: opacity 0.4s, transform 0.4s;
+  }
+  .flame.lit { opacity: 1; animation: flicker 0.8s infinite alternate ease-in-out; }
+  @keyframes flicker {
+    from { transform: scale(1) rotate(-2deg); }
+    to   { transform: scale(1.1) rotate(2deg); }
+  }
+
+  /* Divider */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 24px 0;
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    margin-top: 60px;
+    color: var(--muted);
+    font-size: 0.78rem;
+    letter-spacing: 0.05em;
+    opacity: 0.6;
+  }
+
+  .error-msg {
+    color: var(--rose);
+    font-size: 0.82rem;
+    margin-top: 6px;
+    display: none;
+  }
+  .error-msg.show { display: block; }
+</style>
+</head>
+<body>
+
+<!-- Stars background -->
+<div class="stars" id="stars"></div>
+
+<div class="container">
+  <header>
+    <span class="logo-icon">✨</span>
+    <h1>CalcuLove</h1>
+    <p class="tagline">Age · Love · Life's little calculations</p>
+  </header>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="age" onclick="switchTab('age')">
+      🎂 Age Calculator
+    </button>
+    <button class="tab-btn" data-tab="love" onclick="switchTab('love')">
+      💕 Love Calculator
+    </button>
+    <button class="tab-btn" data-tab="calc" onclick="switchTab('calc')">
+      🧮 Calculator
+    </button>
+  </div>
+
+  <!-- Age Panel -->
+  <div id="age-panel" class="calc-panel active">
+    <div class="card">
+      <div class="card-title">🎂 Age Calculator</div>
+      <div class="card-subtitle">Find out exactly how old you are — down to the day</div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label>Your Date of Birth</label>
+          <input type="date" id="dob" max="">
+          <span class="error-msg" id="dob-error">Please enter a valid date of birth.</span>
+        </div>
+        <div class="field">
+          <label>Calculate Age As Of</label>
+          <input type="date" id="calc-date">
+        </div>
+      </div>
+
+      <button class="btn btn-gold" onclick="calculateAge()">
+        ✨ Calculate My Age
+      </button>
+
+      <div class="result-box" id="age-result">
+        <div class="age-main">
+          <div class="age-big" id="age-years">—</div>
+          <div class="age-label">Years Old</div>
+        </div>
+        <div class="age-stats">
+          <div class="stat-item">
+            <span class="stat-value" id="stat-months">—</span>
+            <span class="stat-label">Months</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value" id="stat-weeks">—</span>
+            <span class="stat-label">Weeks</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value" id="stat-days">—</span>
+            <span class="stat-label">Days</span>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="age-stats">
+          <div class="stat-item">
+            <span class="stat-value" id="stat-hours">—</span>
+            <span class="stat-label">Hours</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value" id="stat-minutes">—</span>
+            <span class="stat-label">Minutes</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value" id="stat-seconds">—</span>
+            <span class="stat-label">Seconds</span>
+          </div>
+        </div>
+        <div class="next-birthday" id="next-bday"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Love Panel -->
+  <div id="love-panel" class="calc-panel">
+    <div class="card">
+      <div class="card-title">💕 Love Calculator</div>
+      <div class="card-subtitle">Discover the compatibility between two hearts</div>
+
+      <div class="form-grid two-col">
+        <div class="field">
+          <label>Your Name</label>
+          <input type="text" id="name1" placeholder="Enter your name…" oninput="clearLove()">
+        </div>
+        <div class="field">
+          <label>Their Name</label>
+          <input type="text" id="name2" placeholder="Enter their name…" oninput="clearLove()">
+        </div>
+      </div>
+      <span class="error-msg" id="love-error">Please enter both names.</span>
+
+      <button class="btn btn-rose" onclick="calculateLove()">
+        💖 Calculate Love Score
+      </button>
+
+      <div class="result-box" id="love-result">
+        <div class="love-score-wrap">
+          <div class="heart-ring">
+            <svg width="140" height="140" viewBox="0 0 140 140">
+              <circle class="ring-bg" cx="70" cy="70" r="60" stroke-width="10" fill="none"/>
+              <circle class="ring-fill" id="love-ring" cx="70" cy="70" r="60" stroke-width="10" fill="none" stroke-linecap="round"/>
+            </svg>
+            <div class="heart-inner">
+              <span class="heart-emoji">💗</span>
+              <span class="love-pct" id="love-pct">0%</span>
+            </div>
+          </div>
+
+          <div class="love-verdict" id="love-verdict"></div>
+          <div class="love-desc" id="love-desc"></div>
+
+          <div class="love-flames" id="love-flames">
+            <span class="flame">🔥</span>
+            <span class="flame">🔥</span>
+            <span class="flame">🔥</span>
+            <span class="flame">🔥</span>
+            <span class="flame">🔥</span>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div style="text-align:center; font-size:0.8rem; color:var(--muted); font-style:italic;">
+          ✨ Based on name compatibility analysis
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Calculator Panel -->
+  <div id="calc-panel" class="calc-panel">
+    <div class="card">
+      <div class="card-title">🧮 Calculator</div>
+      <div class="card-subtitle">Fast, precise, and beautiful arithmetic</div>
+
+      <div class="calc-display">
+        <div class="calc-expression" id="c-expr"></div>
+        <div class="calc-input" id="c-display">0</div>
+      </div>
+
+      <div class="calc-grid">
+        <!-- Row 1 -->
+        <button class="c-btn fn" onclick="calcFn('AC')">AC</button>
+        <button class="c-btn fn" onclick="calcFn('+/-')">+/−</button>
+        <button class="c-btn fn" onclick="calcFn('%')">%</button>
+        <button class="c-btn op" onclick="calcOp('÷')">÷</button>
+        <!-- Row 2 -->
+        <button class="c-btn num" onclick="calcNum('7')">7</button>
+        <button class="c-btn num" onclick="calcNum('8')">8</button>
+        <button class="c-btn num" onclick="calcNum('9')">9</button>
+        <button class="c-btn op" onclick="calcOp('×')">×</button>
+        <!-- Row 3 -->
+        <button class="c-btn num" onclick="calcNum('4')">4</button>
+        <button class="c-btn num" onclick="calcNum('5')">5</button>
+        <button class="c-btn num" onclick="calcNum('6')">6</button>
+        <button class="c-btn op" onclick="calcOp('−')">−</button>
+        <!-- Row 4 -->
+        <button class="c-btn num" onclick="calcNum('1')">1</button>
+        <button class="c-btn num" onclick="calcNum('2')">2</button>
+        <button class="c-btn num" onclick="calcNum('3')">3</button>
+        <button class="c-btn op" onclick="calcOp('+')">+</button>
+        <!-- Row 5 -->
+        <button class="c-btn num span2" onclick="calcNum('0')">0</button>
+        <button class="c-btn num" onclick="calcDot()">.</button>
+        <button class="c-btn equals" onclick="calcEquals()">=</button>
+      </div>
+
+      <div class="calc-history" id="c-history"></div>
+    </div>
+  </div>
+
+  <footer>
+    CalcuLove &nbsp;·&nbsp; Made with 💛 for every curious heart
+  </footer>
+</div>
+
+<script>
+  // --- Stars ---
+  const starsEl = document.getElementById('stars');
+  for (let i = 0; i < 80; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random() * 2 + 0.5;
+    s.style.cssText = `
+      width: ${size}px; height: ${size}px;
+      top: ${Math.random()*100}%;
+      left: ${Math.random()*100}%;
+      --dur: ${2 + Math.random()*4}s;
+      --delay: ${Math.random()*5}s;
+    `;
+    starsEl.appendChild(s);
+  }
+
+  // --- Set default dates ---
+  const today = new Date();
+  const fmt = d => d.toISOString().split('T')[0];
+  document.getElementById('calc-date').value = fmt(today);
+  document.getElementById('dob').max = fmt(today);
+
+  // --- Tab switch ---
+  function switchTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.calc-panel').forEach(p => p.classList.remove('active'));
+    document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
+    document.getElementById(`${tab}-panel`).classList.add('active');
+  }
+
+  // --- Age Calculator ---
+  function calculateAge() {
+    const dobVal = document.getElementById('dob').value;
+    const calcVal = document.getElementById('calc-date').value;
+    const dobErr = document.getElementById('dob-error');
+    const result = document.getElementById('age-result');
+
+    if (!dobVal) {
+      dobErr.classList.add('show');
+      result.classList.remove('show');
+      return;
+    }
+    dobErr.classList.remove('show');
+
+    const dob = new Date(dobVal);
+    const calc = calcVal ? new Date(calcVal) : today;
+
+    if (dob > calc) {
+      dobErr.textContent = 'Date of birth cannot be in the future.';
+      dobErr.classList.add('show');
+      result.classList.remove('show');
+      return;
+    }
+
+    // Years, months, days
+    let years = calc.getFullYear() - dob.getFullYear();
+    let months = calc.getMonth() - dob.getMonth();
+    let days = calc.getDate() - dob.getDate();
+
+    if (days < 0) {
+      months--;
+      const prevMonth = new Date(calc.getFullYear(), calc.getMonth(), 0);
+      days += prevMonth.getDate();
+    }
+    if (months < 0) { years--; months += 12; }
+
+    const diffMs = calc - dob;
+    const totalDays = Math.floor(diffMs / 86400000);
+    const totalWeeks = Math.floor(totalDays / 7);
+    const totalMonths = years * 12 + months;
+    const totalHours = Math.floor(diffMs / 3600000);
+    const totalMinutes = Math.floor(diffMs / 60000);
+    const totalSeconds = Math.floor(diffMs / 1000);
+
+    document.getElementById('age-years').textContent = years;
+    document.getElementById('stat-months').textContent = totalMonths.toLocaleString();
+    document.getElementById('stat-weeks').textContent = totalWeeks.toLocaleString();
+    document.getElementById('stat-days').textContent = totalDays.toLocaleString();
+    document.getElementById('stat-hours').textContent = totalHours.toLocaleString();
+    document.getElementById('stat-minutes').textContent = totalMinutes.toLocaleString();
+    document.getElementById('stat-seconds').textContent = totalSeconds.toLocaleString();
+
+    // Next birthday
+    const nextBD = new Date(calc.getFullYear(), dob.getMonth(), dob.getDate());
+    if (nextBD <= calc) nextBD.setFullYear(nextBD.getFullYear() + 1);
+    const daysToNext = Math.ceil((nextBD - calc) / 86400000);
+    const nextEl = document.getElementById('next-bday');
+    if (daysToNext === 0) {
+      nextEl.innerHTML = '🎉 Today is your birthday! Happy Birthday!';
+    } else {
+      nextEl.innerHTML = `🎂 Your next birthday is in <strong>${daysToNext}</strong> day${daysToNext !== 1 ? 's' : ''}`;
+    }
+
+    result.classList.remove('show');
+    requestAnimationFrame(() => result.classList.add('show'));
+  }
+
+  // --- Love Calculator ---
+  const loveData = [
+    { min: 0,  max: 20,  verdict: 'Just Friends 🤝',       desc: 'The stars have spoken — this is a beautiful friendship. Cherish it!' },
+    { min: 21, max: 40,  verdict: 'Crushing Hard 🌸',       desc: 'There are sparks, but the flame needs a little more fanning. Keep going!' },
+    { min: 41, max: 60,  verdict: 'Good Chemistry ⚗️',      desc: 'You two have real chemistry! This could be something special.' },
+    { min: 61, max: 75,  verdict: 'Strong Connection 💫',   desc: 'The universe is rooting for you both. A deep bond awaits!' },
+    { min: 76, max: 89,  verdict: 'Almost Soulmates 🌙',    desc: 'Incredible compatibility! You complete each other in beautiful ways.' },
+    { min: 90, max: 100, verdict: 'Perfect Match 💖',       desc: 'Written in the stars. A rare and extraordinary love — treasure it always.' }
+  ];
+
+  function loveAlgorithm(a, b) {
+    const combined = (a + b).toUpperCase().replace(/[^A-Z]/g, '');
+    const counts = {};
+    for (const c of 'LOVES') counts[c] = 0;
+    for (const c of combined) if (counts[c] !== undefined) counts[c]++;
+
+    let arr = Object.values(counts);
+    while (arr.length > 2) {
+      const next = [];
+      for (let i = 0; i < arr.length - 1; i++) next.push((arr[i] + arr[i+1]) % 10);
+      arr = next;
+    }
+    return arr[0] * 10 + arr[1];
+  }
+
+  function clearLove() {
+    document.getElementById('love-result').classList.remove('show');
+  }
+
+  function calculateLove() {
+    const n1 = document.getElementById('name1').value.trim();
+    const n2 = document.getElementById('name2').value.trim();
+    const err = document.getElementById('love-error');
+    const result = document.getElementById('love-result');
+
+    if (!n1 || !n2) {
+      err.classList.add('show');
+      return;
+    }
+    err.classList.remove('show');
+
+    const score = loveAlgorithm(n1, n2);
+    const data = loveData.find(d => score >= d.min && score <= d.max);
+
+    document.getElementById('love-pct').textContent = score + '%';
+    document.getElementById('love-verdict').textContent = data.verdict;
+    document.getElementById('love-desc').textContent = data.desc;
+
+    // Ring animation
+    const ring = document.getElementById('love-ring');
+    const circumference = 2 * Math.PI * 60;
+    ring.style.strokeDashoffset = circumference;
+    setTimeout(() => {
+      ring.style.strokeDashoffset = circumference - (score / 100) * circumference;
+    }, 100);
+
+    // Flames
+    const flames = document.querySelectorAll('.flame');
+    const litCount = Math.round((score / 100) * 5);
+    flames.forEach((f, i) => {
+      f.classList.remove('lit');
+      if (i < litCount) setTimeout(() => f.classList.add('lit'), 200 + i * 150);
+    });
+
+    // Color ring by score
+    const color = score >= 76 ? '#f06c8b' : score >= 50 ? '#e8c97a' : '#9b7fe8';
+    ring.style.stroke = color;
+
+    result.classList.remove('show');
+    requestAnimationFrame(() => result.classList.add('show'));
+  }
+
+  // --- Standard Calculator ---
+  let cCurrent = '0', cPrev = '', cOperator = '', cShouldReset = false;
+  const cDisp = () => document.getElementById('c-display');
+  const cExpr = () => document.getElementById('c-expr');
+  const cHist = () => document.getElementById('c-history');
+
+  function cUpdate(val) {
+    cDisp().textContent = val;
+    cDisp().classList.remove('error');
+  }
+
+  function calcNum(n) {
+    if (cShouldReset) { cCurrent = n; cShouldReset = false; }
+    else cCurrent = cCurrent === '0' ? n : cCurrent + n;
+    if (cCurrent.length > 12) cCurrent = cCurrent.slice(0, 12);
+    cUpdate(cCurrent);
+  }
+
+  function calcDot() {
+    if (cShouldReset) { cCurrent = '0.'; cShouldReset = false; }
+    else if (!cCurrent.includes('.')) cCurrent += '.';
+    cUpdate(cCurrent);
+  }
+
+  function calcOp(op) {
+    if (cOperator && !cShouldReset) calcEquals(true);
+    cPrev = cCurrent;
+    cOperator = op;
+    cShouldReset = true;
+    cExpr().textContent = cPrev + ' ' + op;
+  }
+
+  function calcEquals(chain = false) {
+    if (!cOperator || !cPrev) return;
+    const a = parseFloat(cPrev), b = parseFloat(cCurrent);
+    let result;
+    if (cOperator === '+') result = a + b;
+    else if (cOperator === '−') result = a - b;
+    else if (cOperator === '×') result = a * b;
+    else if (cOperator === '÷') {
+      if (b === 0) {
+        cDisp().textContent = 'Cannot ÷ 0';
+        cDisp().classList.add('error');
+        cExpr().textContent = '';
+        cOperator = ''; cPrev = ''; cShouldReset = true;
+        return;
+      }
+      result = a / b;
+    }
+
+    const rounded = parseFloat(result.toPrecision(12));
+    const display = String(rounded).length > 12 ? rounded.toExponential(4) : String(rounded);
+
+    if (!chain) {
+      // Add to history
+      const expr = `${cPrev} ${cOperator} ${cCurrent}`;
+      const item = document.createElement('div');
+      item.className = 'history-item';
+      item.innerHTML = `<span>${expr}</span><span class="h-result">= ${display}</span>`;
+      item.onclick = () => { cCurrent = display; cShouldReset = false; cUpdate(cCurrent); cExpr().textContent = ''; };
+      cHist().prepend(item);
+      cExpr().textContent = expr + ' =';
+      cOperator = '';
+    }
+
+    cCurrent = display;
+    cUpdate(cCurrent);
+    cShouldReset = !chain;
+    if (!chain) cPrev = '';
+  }
+
+  function calcFn(fn) {
+    if (fn === 'AC') {
+      cCurrent = '0'; cPrev = ''; cOperator = ''; cShouldReset = false;
+      cUpdate('0'); cExpr().textContent = '';
+    } else if (fn === '+/-') {
+      cCurrent = String(parseFloat(cCurrent) * -1);
+      cUpdate(cCurrent);
+    } else if (fn === '%') {
+      cCurrent = String(parseFloat(cCurrent) / 100);
+      cUpdate(cCurrent);
+    }
+  }
+
+  // Keyboard support for calculator
+  document.addEventListener('keydown', e => {
+    const calcActive = document.getElementById('calc-panel').classList.contains('active');
+    const ageActive = document.getElementById('age-panel').classList.contains('active');
+
+    if (calcActive) {
+      if (e.key >= '0' && e.key <= '9') calcNum(e.key);
+      else if (e.key === '.') calcDot();
+      else if (e.key === '+') calcOp('+');
+      else if (e.key === '-') calcOp('−');
+      else if (e.key === '*') calcOp('×');
+      else if (e.key === '/') { e.preventDefault(); calcOp('÷'); }
+      else if (e.key === '%') calcFn('%');
+      else if (e.key === 'Enter' || e.key === '=') calcEquals();
+      else if (e.key === 'Escape') calcFn('AC');
+      else if (e.key === 'Backspace') {
+        if (!cShouldReset && cCurrent.length > 1) cCurrent = cCurrent.slice(0, -1);
+        else cCurrent = '0';
+        cUpdate(cCurrent);
+      }
+    } else if (e.key === 'Enter') {
+      if (ageActive) calculateAge();
+      else calculateLove();
+    }
+  });
+
+</script>
+</body>
+</html>
